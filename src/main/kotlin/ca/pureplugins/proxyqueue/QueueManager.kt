@@ -8,10 +8,11 @@ import net.md_5.bungee.api.scheduler.TaskScheduler
 import java.util.concurrent.TimeUnit
 
 class QueueManager(
-    private val plugin: Plugin,
-    private val scheduler: TaskScheduler) {
+    private val plugin: Plugin) {
 
     private val serverQueues = mutableMapOf<ServerInfo, ServerQueue>()
+    private val scheduler = plugin.proxy.scheduler
+
     private lateinit var task: ScheduledTask
 
     private fun run() =

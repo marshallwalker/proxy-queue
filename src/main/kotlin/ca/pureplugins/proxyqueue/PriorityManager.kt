@@ -20,6 +20,14 @@ class PriorityManager(
         }
     }
 
+    private fun registerNode(server: String, key: String, priority: Int) {
+        val node = luckPermsApi.buildNode(key)
+            .setServer(server)
+            .build()
+
+        priorities += PermissionPriority(node, priority)
+    }
+
     private fun registerPermissions(server: String, section: Configuration) {
         val priorities = section.keys
             .map { it to section.getStringList(it) }
@@ -28,11 +36,7 @@ class PriorityManager(
 
         priorities.forEach { priority, permissions ->
             permissions.forEach { permission ->
-                val node = luckPermsApi.buildNode(permission)
-                    .setServer(server)
-                    .build()
-
-                this.priorities += PermissionPriority(node, priority)
+                registerNode(server, permission, priority)
             }
         }
     }

@@ -31,7 +31,7 @@ class ServerListener(
         val player = event.player
         val target = event.target
 
-        // return if player is just connecting to proxy OR already on server target server
+        // return if player is just connecting to proxy OR already on target server
         if (player.server == null || player.server.info == target) {
             return
         }
