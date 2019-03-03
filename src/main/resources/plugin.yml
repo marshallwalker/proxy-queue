@@ -1,0 +1,6 @@
+main: ca.pureplugins.gg.fatal.ProxyQueuePlugin
+name: ProxyQueue
+version: 1.0.0
+author: PurePlugins
+
+depend: [LuckPerms]
