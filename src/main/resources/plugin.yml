@@ -1,4 +1,4 @@
-main: ca.pureplugins.gg.fatal.ProxyQueuePlugin
+main: ca.pureplugins.proxyqueue.ProxyQueuePlugin
 name: ProxyQueue
 version: 1.0.0
 author: PurePlugins
