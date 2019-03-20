@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.config.ServerInfo
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.config.Configuration
+import java.util.function.Predicate
 
 class PriorityManager(
     proxy: ProxyServer,
@@ -15,6 +16,8 @@ class PriorityManager(
     private val priorities = mutableListOf<PermissionPriority>()
 
     init {
+        registerPermissions("global", config)
+
         proxy.servers.forEach { serverName, _ ->
             registerPermissions(serverName, config)
         }
@@ -43,9 +46,11 @@ class PriorityManager(
 
     fun getQueuePriority(player: ProxiedPlayer, server: ServerInfo): Int {
         val luckPermsUser = luckPermsApi.getUser(player.uniqueId) ?: return 0
+        val predicate = Predicate<String> {it == "global" || it == server.name}
+
         val permissionPriority = priorities
-            .filter { luckPermsUser.hasPermission(it.permission) == Tristate.TRUE }
-            .filter { it.permission.server.orElse("") == server.name }
+            .filter { luckPermsUser.inheritsPermission(it.permission) == Tristate.TRUE }
+            .filter { predicate.test(it.permission.server.orElse("global")) }
             .maxBy { it.priority }
 
         return permissionPriority?.priority ?: 0

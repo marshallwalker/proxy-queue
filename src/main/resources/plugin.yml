@@ -3,4 +3,4 @@ name: ProxyQueue
 version: 1.0.0
 author: PurePlugins
 
-depend: [LuckPerms]
+depends: [LuckPerms]
