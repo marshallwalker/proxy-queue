@@ -2,8 +2,10 @@ general:
   join delay seconds: 3
   enqueue message: "&bYou are now &e$position &bin the queue to join &a$server&b. priority &5$priority"
 
-priority:
-  100:
-    - queue.priority.staff
-  10:
-    - queue.priority.high
+levels:
+  - priority: 100
+    permission: queue.priority.staff
+    name: Highest
+  - priority: 10
+    permission: queue.priority.boi
+    name: Some Text

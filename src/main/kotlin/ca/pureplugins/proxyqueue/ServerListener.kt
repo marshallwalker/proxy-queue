@@ -29,10 +29,10 @@ class ServerListener(
     @EventHandler
     fun onServerConnectEvent(event: ServerConnectEvent) {
         val player = event.player
-        val target = event.target
+        val targetServer = event.target
 
         // return if player is just connecting to proxy OR already on target server
-        if (player.server == null || player.server.info == target) {
+        if (player.server == null || player.server.info == targetServer) {
             return
         }
 
@@ -44,10 +44,10 @@ class ServerListener(
         event.isCancelled = true
         playerLock.lock(player)
 
-        val queuePriority = priorityManager.getQueuePriority(player, target)
-        val queuePosition = queueManager.enqueue(player, target, queuePriority)
+        val priorityLevel = priorityManager.getQueuePriority(player, targetServer)
+        val queuePosition = queueManager.enqueue(player, targetServer, priorityLevel.priority)
 
-        player.sendMessage("You are ${getOrdinal(queuePosition)} to join ${target.name} at priority $queuePriority")
+        player.sendMessage("You are ${getOrdinal(queuePosition)} to join ${targetServer.name} at priority ${priorityLevel.name}")
     }
 
     @EventHandler

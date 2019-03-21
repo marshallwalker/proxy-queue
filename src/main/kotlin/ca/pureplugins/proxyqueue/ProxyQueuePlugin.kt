@@ -3,6 +3,7 @@ package ca.pureplugins.proxyqueue
 import me.lucko.luckperms.LuckPerms
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
+import net.md_5.bungee.config.Configuration
 import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
@@ -34,7 +35,10 @@ class ProxyQueuePlugin : Plugin(), Listener {
         val queueManager = QueueManager(this)
         queueManager.start(joinDelay, TimeUnit.SECONDS)
 
-        val prioritySection = configuration.getSection("priority")
+        val prioritySection = configuration.getList("levels")
+            .map { it as Map<String, Any> }
+            .map { PriorityLevel(it) }
+
         val priorityManager = PriorityManager(proxy, luckPermsApi, prioritySection)
 
         proxy.pluginManager.registerListener(this, ServerListener(priorityManager, queueManager))
