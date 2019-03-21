@@ -36,10 +36,10 @@ class ProxyQueuePlugin : Plugin(), Listener {
         queueManager.start(joinDelay, TimeUnit.SECONDS)
 
         val prioritySection = configuration.getList("levels")
-            .map { it as Map<String, Any> }
-            .map { PriorityLevel(it) }
+            .map { PriorityLevel(it as Map<String , Any>) }
 
-        val priorityManager = PriorityManager(proxy, luckPermsApi, prioritySection)
+       // val prioritySection = configuration.getList("levels") as List<Map<String, Any>>
+        val priorityManager = PriorityManager(this, luckPermsApi, prioritySection)
 
         proxy.pluginManager.registerListener(this, ServerListener(priorityManager, queueManager))
     }
