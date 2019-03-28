@@ -1,5 +1,7 @@
 package ca.pureplugins.proxyqueue
 
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.event.ServerConnectEvent
 import net.md_5.bungee.api.event.ServerConnectedEvent
 import net.md_5.bungee.api.plugin.Listener
@@ -7,7 +9,9 @@ import net.md_5.bungee.event.EventHandler
 
 class ServerListener(
     private val priorityManager: PriorityManager,
-    private val queueManager: QueueManager) : Listener {
+    private val queueManager: QueueManager,
+    private val ignoredServers: List<String>,
+    private val queueMessage: List<String>) : Listener {
 
     private val playerLock = PlayerLock()
 
@@ -36,6 +40,11 @@ class ServerListener(
             return
         }
 
+        //server ignored
+        if (ignoredServers.any { targetServer.name == it }) {
+            return
+        }
+
         // return if player is locked
         if (playerLock.isLocked(player)) {
             return
@@ -47,7 +56,18 @@ class ServerListener(
         val priorityLevel = priorityManager.getQueuePriority(player, targetServer)
         val queuePosition = queueManager.enqueue(player, targetServer, priorityLevel.priority)
 
-        player.sendMessage("You are ${getOrdinal(queuePosition)} to join ${targetServer.name} at priority ${priorityLevel.name}")
+        queueMessage.forEach { line ->
+            player.sendMessage(
+                TextComponent(
+                    ChatColor.translateAlternateColorCodes(
+                        '&', line
+                            .replace("\$position", getOrdinal(queuePosition))
+                            .replace("\$server", targetServer.name)
+                            .replace("\$priority", priorityLevel.name)
+                    )
+                )
+            )
+        }
     }
 
     @EventHandler

@@ -1,6 +1,9 @@
 general:
   join delay seconds: 3
-  enqueue message: "&bYou are now &e$position &bin the queue to join &a$server&b. priority &5$priority"
+  ignore:
+    - lobby
+  enqueue message:
+    - "&bYou are now &e$position &bin the queue to join &a$server&b. priority &5$priority"
 
 levels:
   - priority: 100

@@ -1,6 +1,6 @@
 main: ca.pureplugins.proxyqueue.ProxyQueuePlugin
 name: ProxyQueue
-version: 1.0.0
+version: 1.2.0
 author: PurePlugins
 
-depends: [LuckPerms]
+softDepends: [LuckPerms]
