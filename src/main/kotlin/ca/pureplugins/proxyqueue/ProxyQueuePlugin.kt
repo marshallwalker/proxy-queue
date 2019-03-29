@@ -1,7 +1,11 @@
 package ca.pureplugins.proxyqueue
 
-import ca.pureplugins.proxyqueue.api.impl.LuckApi
+import ca.pureplugins.proxyqueue.api.BungeeCordPermissionApi
+import ca.pureplugins.proxyqueue.api.LuckPermsPermissionApi
 import ca.pureplugins.proxyqueue.api.PermissionApi
+import ca.pureplugins.proxyqueue.manager.PriorityManager
+import ca.pureplugins.proxyqueue.manager.QueueManager
+import ca.pureplugins.proxyqueue.model.PriorityLevel
 import me.lucko.luckperms.LuckPerms
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
@@ -18,17 +22,19 @@ class ProxyQueuePlugin : Plugin(), Listener {
 
         LuckPerms.getApiSafe().ifPresent {
             logger.info("LuckPerms detected, hooking!")
-            permissionApi = LuckApi(it)
+            permissionApi = LuckPermsPermissionApi(it)
         }
 
-        if(permissionApi == null) {
-            proxy.stop("Unable to get instance of permissions plugin.")
+        if (permissionApi == null) {
+            logger.info("no 3rd party permissions detected, using bungee permissions.")
+            permissionApi = BungeeCordPermissionApi()
             return
         }
 
         val configFile = File(dataFolder, "config.yml")
 
         if (!configFile.exists()) {
+            logger.info("Creating default config.yml")
             configFile.parentFile.mkdir()
             val resourceStream = javaClass.classLoader.getResourceAsStream(configFile.name)
             configFile.outputStream().use { resourceStream.copyTo(it) }
@@ -42,14 +48,16 @@ class ProxyQueuePlugin : Plugin(), Listener {
         val ignoredServers = generalSection.getStringList("ignore")
         val queueMessages = generalSection.getStringList("enqueue message")
 
-        val queueManager = QueueManager(this)
-        queueManager.start(joinDelay, TimeUnit.SECONDS)
+        this.queueManager = QueueManager(this)
+            .start(joinDelay, TimeUnit.SECONDS)
 
         val prioritySection = configuration.getList("levels")
-            .map { PriorityLevel(it as Map<String, Any>) }
+            .map { PriorityLevel(it as Map<*, *>) }
 
         val priorityManager = PriorityManager(this, permissionApi!!, prioritySection)
-        proxy.pluginManager.registerListener(this, ServerListener(priorityManager, queueManager, ignoredServers, queueMessages))
+        val serverListener = ServerListener(priorityManager, queueManager, ignoredServers, queueMessages)
+
+        proxy.pluginManager.registerListener(this, serverListener)
     }
 
     override fun onDisable() =

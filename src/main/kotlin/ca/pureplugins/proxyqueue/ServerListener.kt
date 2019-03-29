@@ -1,5 +1,9 @@
 package ca.pureplugins.proxyqueue
 
+import ca.pureplugins.proxyqueue.manager.PriorityManager
+import ca.pureplugins.proxyqueue.manager.QueueManager
+import ca.pureplugins.proxyqueue.util.PlayerLock
+import ca.pureplugins.proxyqueue.util.toOrdinal
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.event.ServerConnectEvent
@@ -11,24 +15,10 @@ class ServerListener(
     private val priorityManager: PriorityManager,
     private val queueManager: QueueManager,
     private val ignoredServers: List<String>,
-    private val queueMessage: List<String>) : Listener {
+    private val queueMessage: List<String>
+) : Listener {
 
     private val playerLock = PlayerLock()
-
-    private fun getOrdinal(number: Int): String {
-        val mod100 = number % 100
-        val mod10 = number % 10
-
-        return "$number" + if (mod10 == 1 && mod100 != 11) {
-            "st"
-        } else if (mod10 == 2 && mod100 != 12) {
-            "nd"
-        } else if (mod10 == 3 && mod100 != 13) {
-            "rd"
-        } else {
-            "th"
-        }
-    }
 
     @EventHandler
     fun onServerConnectEvent(event: ServerConnectEvent) {
@@ -40,12 +30,12 @@ class ServerListener(
             return
         }
 
-        //server ignored
+        //server is ignored return
         if (ignoredServers.any { targetServer.name == it }) {
             return
         }
 
-        // return if player is locked
+        // player is locked return
         if (playerLock.isLocked(player)) {
             return
         }
@@ -53,17 +43,18 @@ class ServerListener(
         event.isCancelled = true
         playerLock.lock(player)
 
-        val priorityLevel = priorityManager.getQueuePriority(player, targetServer)
-        val queuePosition = queueManager.enqueue(player, targetServer, priorityLevel.priority)
+        val queuePriority = priorityManager.getQueuePriority(player, targetServer)
+        val queuePosition = queueManager.enqueuePlayer(player, targetServer, queuePriority)
 
         queueMessage.forEach { line ->
             player.sendMessage(
                 TextComponent(
                     ChatColor.translateAlternateColorCodes(
-                        '&', line
-                            .replace("\$position", getOrdinal(queuePosition))
+                        '&',
+                        line
+                            .replace("\$position", queuePosition.toOrdinal())
                             .replace("\$server", targetServer.name)
-                            .replace("\$priority", priorityLevel.name)
+                            .replace("\$priority", queuePriority.name)
                     )
                 )
             )

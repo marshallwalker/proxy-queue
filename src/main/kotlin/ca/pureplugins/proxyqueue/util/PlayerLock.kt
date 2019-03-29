@@ -1,4 +1,4 @@
-package ca.pureplugins.proxyqueue
+package ca.pureplugins.proxyqueue.util
 
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import java.util.*

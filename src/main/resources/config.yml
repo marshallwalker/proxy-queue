@@ -7,8 +7,8 @@ general:
 
 levels:
   - priority: 100
-    permission: queue.priority.staff
+    permission: queue.priorityLevel.staff
     name: Highest
   - priority: 10
-    permission: queue.priority.boi
+    permission: queue.priorityLevel.boi
     name: Some Text

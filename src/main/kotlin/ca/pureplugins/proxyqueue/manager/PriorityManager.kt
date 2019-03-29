@@ -1,5 +1,6 @@
-package ca.pureplugins.proxyqueue
+package ca.pureplugins.proxyqueue.manager
 
+import ca.pureplugins.proxyqueue.model.PriorityLevel
 import ca.pureplugins.proxyqueue.api.PermissionApi
 import net.md_5.bungee.api.config.ServerInfo
 import net.md_5.bungee.api.connection.ProxiedPlayer
@@ -18,8 +19,8 @@ class PriorityManager(
     }
 
     private fun createPermissionNode(serverContext: String, level: PriorityLevel) {
-        plugin.logger.info("Creating permission node ${level.permission}, server=$serverContext, priority=${level.priority}")
-        permissionApi.registerPermission(level.permission, serverContext, level.priority)
+        plugin.logger.info("Creating permission node ${level.permission}, server=$serverContext, priorityLevel=${level.priority}")
+        permissionApi.registerPermission(level.permission, serverContext, level)
     }
 
     private fun registerPermissions(serverContext: String) =
@@ -27,5 +28,5 @@ class PriorityManager(
 
     fun getQueuePriority(player: ProxiedPlayer, server: ServerInfo) = priorityLevels
         .filter { level -> permissionApi.hasPermission(player, level.permission, server.name) }
-        .maxBy { it.priority } ?: defaultPriority
+        .maxBy(PriorityLevel::priority) ?: defaultPriority
 }
