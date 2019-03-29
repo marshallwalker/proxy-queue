@@ -1,8 +1,8 @@
 package ca.pureplugins.proxyqueue
 
-import ca.pureplugins.proxyqueue.api.BungeeCordPermissionApi
-import ca.pureplugins.proxyqueue.api.LuckPermsPermissionApi
-import ca.pureplugins.proxyqueue.api.PermissionApi
+import ca.pureplugins.proxyqueue.api.impl.BungeeCordProvider
+import ca.pureplugins.proxyqueue.api.impl.LuckPermsProvider
+import ca.pureplugins.proxyqueue.api.PermissionProvider
 import ca.pureplugins.proxyqueue.manager.PriorityManager
 import ca.pureplugins.proxyqueue.manager.QueueManager
 import ca.pureplugins.proxyqueue.model.PriorityLevel
@@ -18,16 +18,16 @@ class ProxyQueuePlugin : Plugin(), Listener {
     private lateinit var queueManager: QueueManager
 
     override fun onEnable() {
-        var permissionApi: PermissionApi? = null
+        var permissionProvider: PermissionProvider? = null
 
         LuckPerms.getApiSafe().ifPresent {
             logger.info("LuckPerms detected, hooking!")
-            permissionApi = LuckPermsPermissionApi(it)
+            permissionProvider = LuckPermsProvider(it)
         }
 
-        if (permissionApi == null) {
+        if (permissionProvider == null) {
             logger.info("no 3rd party permissions detected, using bungee permissions.")
-            permissionApi = BungeeCordPermissionApi()
+            permissionProvider = BungeeCordProvider()
             return
         }
 
@@ -54,7 +54,7 @@ class ProxyQueuePlugin : Plugin(), Listener {
         val prioritySection = configuration.getList("levels")
             .map { PriorityLevel(it as Map<*, *>) }
 
-        val priorityManager = PriorityManager(this, permissionApi!!, prioritySection)
+        val priorityManager = PriorityManager(this, permissionProvider!!, prioritySection)
         val serverListener = ServerListener(priorityManager, queueManager, ignoredServers, queueMessages)
 
         proxy.pluginManager.registerListener(this, serverListener)

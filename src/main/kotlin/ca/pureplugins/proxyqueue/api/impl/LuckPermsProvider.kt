@@ -1,13 +1,14 @@
-package ca.pureplugins.proxyqueue.api
+package ca.pureplugins.proxyqueue.api.impl
 
+import ca.pureplugins.proxyqueue.api.PermissionProvider
 import ca.pureplugins.proxyqueue.model.PermissionPriority
 import ca.pureplugins.proxyqueue.model.PriorityLevel
 import me.lucko.luckperms.api.LuckPermsApi
 import me.lucko.luckperms.api.Node
 import net.md_5.bungee.api.connection.ProxiedPlayer
 
-class LuckPermsPermissionApi(
-    private val api: LuckPermsApi) : PermissionApi {
+class LuckPermsProvider(
+    private val api: LuckPermsApi) : PermissionProvider {
 
     private val permissions = mutableListOf<PermissionPriority<Node>>()
 

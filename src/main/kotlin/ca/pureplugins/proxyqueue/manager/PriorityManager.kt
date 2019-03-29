@@ -1,14 +1,14 @@
 package ca.pureplugins.proxyqueue.manager
 
 import ca.pureplugins.proxyqueue.model.PriorityLevel
-import ca.pureplugins.proxyqueue.api.PermissionApi
+import ca.pureplugins.proxyqueue.api.PermissionProvider
 import net.md_5.bungee.api.config.ServerInfo
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.plugin.Plugin
 
 class PriorityManager(
     private val plugin: Plugin,
-    private val permissionApi: PermissionApi,
+    private val permissionApi: PermissionProvider,
     private val priorityLevels: List<PriorityLevel>) {
 
     private val defaultPriority = PriorityLevel(0, "", "default")
